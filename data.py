@@ -138,3 +138,34 @@ val_transform = Compose(
         NormalizeIntensityd(keys="image", nonzero=True, channel_wise=True),
     ]
 )
+
+def get_data_loader(download=True):
+    
+    directory = os.environ.get("MONAI_DATA_DIRECTORY")
+    if directory is not None:
+        os.makedirs(directory, exist_ok=True)
+
+    train_ds = DecathlonDataset(
+        root_dir=root_dir,
+        task="Task01_BrainTumour",
+        transform=train_transform,
+        section="training",
+        download=download,
+        cache_rate=0.0,
+        num_workers=0,
+    )
+
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=0)
+
+    val_ds = DecathlonDataset(
+        root_dir=root_dir,
+        task="Task01_BrainTumour",
+        transform=val_transform,
+        section="validation",
+        download=False,
+        cache_rate=0.0,
+        num_workers=0,
+    )
+    val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False, num_workers=0)
+
+    return train_loader, val_loader
