@@ -201,13 +201,13 @@ class OutConv(nn.Module):
 
 
 class Encoder(nn.Module):
-    def __init__(self, in_channels):
+    def __init__(self, in_channels, last_relu=False, channels=(64, 128, 256, 512)):
         super(Encoder, self).__init__()
 
-        self.inc = DoubleConv(in_channels, 64, last_relu=True)
-        self.down1 = Down(64, 128, last_relu=True)
-        self.down2 = Down(128, 256, last_relu=True)
-        self.down3 = Down(256, 512)
+        self.inc = DoubleConv(in_channels, channels[0], last_relu=True)
+        self.down1 = Down(channels[0], channels[1], last_relu=True)
+        self.down2 = Down(channels[1], channels[2], last_relu=True)
+        self.down3 = Down(channels[2], channels[3], last_relu=last_relu)
 
     def forward(self, x):
         x1 = self.inc(x)

@@ -1,10 +1,11 @@
 from accelerate import Accelerator, DistributedType
-from data import get_data_loader
+from .data import get_data_loader
 from monai.losses import DiceLoss
 from monai.metrics import DiceMetric
 import torch
+import tqdm
 
-def distributed_trainer(model, validation_size):
+def distributed_trainer(model):
     accelerator = Accelerator()
 
     if accelerator.is_main_process:
@@ -23,7 +24,7 @@ def distributed_trainer(model, validation_size):
     model, optimizer, train_dataloader, eval_dataloader = accelerator.prepare(
         model, optimizer, train_dataloader, eval_dataloader
     )
-    max_epoch = 800
+    num_epochs = max_epoch = 800
     lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoch)
 
     progress_bar = tqdm(range(num_epochs * len(train_dataloader)), disable=not accelerator.is_main_process)
