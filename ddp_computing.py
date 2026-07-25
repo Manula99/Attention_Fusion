@@ -3,7 +3,10 @@ from .data import get_data_loader
 from monai.losses import DiceLoss
 from monai.metrics import DiceMetric
 import torch
-import tqdm
+from tqdm import tqdm
+import datasets
+import transformers
+import os
 
 def distributed_trainer(model):
     accelerator = Accelerator()
@@ -22,7 +25,7 @@ def distributed_trainer(model):
     dice_metric = DiceMetric(include_background=True, reduction="mean")
 
     model, optimizer, train_dataloader, eval_dataloader = accelerator.prepare(
-        model, optimizer, train_dataloader, eval_dataloader
+        model, optimizer, train_loader, val_loader
     )
     num_epochs = max_epoch = 800
     lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoch)

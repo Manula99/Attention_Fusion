@@ -1,4 +1,5 @@
 import torch
+import os
 from monai.transforms import (
     Activations,
     AsDiscrete,
@@ -18,6 +19,9 @@ from monai.transforms import (
     Resized
 )
 from monai.transforms.spatial.functional import resize
+from monai.apps import DecathlonDataset
+
+from monai.data import DataLoader, decollate_batch
 
 
 class ConvertToMultiChannelBasedOnBratsClassesd(MapTransform):
@@ -139,14 +143,14 @@ val_transform = Compose(
     ]
 )
 
-def get_data_loader(download=True):
+def get_data_loader(download=True, batch_size=1):
     
     directory = os.environ.get("MONAI_DATA_DIRECTORY")
     if directory is not None:
         os.makedirs(directory, exist_ok=True)
 
     train_ds = DecathlonDataset(
-        root_dir=root_dir,
+        root_dir=directory,
         task="Task01_BrainTumour",
         transform=train_transform,
         section="training",
@@ -158,7 +162,7 @@ def get_data_loader(download=True):
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=0)
 
     val_ds = DecathlonDataset(
-        root_dir=root_dir,
+        root_dir=directory,
         task="Task01_BrainTumour",
         transform=val_transform,
         section="validation",
