@@ -296,10 +296,10 @@ class U_Transformer(nn.Module):
         self.bilinear = bilinear
 
         self.encoders = nn.ModuleList([Encoder(in_channels, channels=(8, 16, 32, 64)) for _ in range(4)])
-        self.cross_attn1 = MultiHeadCrossAttention(8, (224, 224, 144), 1)
-        self.cross_attn2 = MultiHeadCrossAttention(16, (112, 112, 72), 1)
-        self.cross_attn3 = MultiHeadCrossAttention(32, (56, 56, 36), 1)
-        self.cross_attn4 = MultiHeadCrossAttention(64, (28, 28, 18), 1)
+        self.cross_attn1 = MultiHeadIntraAttention(8, (224, 224, 144), 1)
+        self.cross_attn2 = MultiHeadIntraAttention(16, (112, 112, 72), 1)
+        self.cross_attn3 = MultiHeadIntraAttention(32, (56, 56, 36), 1)
+        self.cross_attn4 = MultiHeadIntraAttention(64, (28, 28, 18), 1)
         self.outc = OutConv(64, classes)
 
         self.up1 = Up(in_channels_from_down_path=64, skip_channels=32, out_channels=32)
