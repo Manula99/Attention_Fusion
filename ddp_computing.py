@@ -8,6 +8,8 @@ import datasets
 import transformers
 import os
 
+from monai.transforms import Activations, Compose, AsDiscrete
+
 def distributed_trainer(model):
     accelerator = Accelerator()
 
@@ -31,12 +33,18 @@ def distributed_trainer(model):
     lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoch)
 
     progress_bar = tqdm(range(num_epochs * len(train_dataloader)), disable=not accelerator.is_main_process)
+    validation_size = len(val_loader)
+
+    post_trans = Compose([Activations(sigmoid=True), AsDiscrete(threshold=0.5)])
 
     for epoch in range(num_epochs):
         model.train()
         for step, batch in enumerate(train_dataloader):
-            outputs = model(**batch)
-            loss = outputs.loss
+            image = batch['image']
+            label = batch['label']
+
+            outputs = model(image)
+            loss = loss_function(outputs, label)
             accelerator.backward(loss)
             
             optimizer.step()
@@ -50,8 +58,8 @@ def distributed_trainer(model):
 
         for step, batch in enumerate(eval_dataloader):
             with torch.no_grad():
-                outputs = model(**batch)
-            predictions = outputs.logits.argmax(dim=-1)
+                outputs = model(batch['image'])
+            predictions = post_trans(outputs)
 
             # We gather predictions and labels from the 8 TPUs to have them all.
             all_predictions.append(accelerator.gather(predictions))
