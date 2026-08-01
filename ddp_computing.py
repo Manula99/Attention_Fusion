@@ -1,5 +1,5 @@
 from accelerate import Accelerator, DistributedType
-from .data import get_data_loader
+from data import get_data_loader
 from monai.losses import DiceLoss
 from monai.metrics import DiceMetric
 import torch
