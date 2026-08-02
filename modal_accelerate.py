@@ -7,7 +7,7 @@ os.environ['MONAI_DATA_DIRECTORY'] = '/content/monai_data'
 image = modal.Image.debian_slim().pip_install("torch", "monai", "accelerate", "tqdm", "datasets", "transformers")
 app = modal.App(image=image)
 
-@app.function(gpu="A100-80GB")
+@app.function(gpu="A100-80GB:3")
 def run():
     model = U_Transformer(4, 3)
     distributed_trainer(model)
