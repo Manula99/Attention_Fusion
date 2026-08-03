@@ -16,7 +16,7 @@ def download_brain_tumour_data():
     download_and_extract(resource, compressed_file, MONAI_DATA_DIR, md5)
 
 image = (modal.Image.debian_slim()
-         .apt_install("git")
+         .apt_install("git", "curl", "unzip", "wget")
          .pip_install("torch", "monai", "accelerate", "tqdm", "datasets", "transformers")
          .run_commands("git clone https://github.com/Manula99/Attention_Fusion.git /root/Attention_Fusion")
          .workdir("/root/Attention_Fusion")
