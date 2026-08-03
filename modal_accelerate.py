@@ -20,7 +20,11 @@ image = (modal.Image.debian_slim()
          .pip_install("torch", "monai", "accelerate", "tqdm", "datasets", "transformers")
          .run_commands("git clone https://github.com/Manula99/Attention_Fusion.git /root/Attention_Fusion")
          .workdir("/root/Attention_Fusion")
-         .run_function(download_brain_tumour_data))
+         .run_commands(
+       f"mkdir -p {MONAI_DATA_DIR}",
+       f"curl -L https://msd-for-monai.s3-us-west-2.amazonaws.com/Task01_BrainTumour.tar -o {MONAI_DATA_DIR}/Task01_BrainTumour.tar",
+       f"tar -xf {MONAI_DATA_DIR}/Task01_BrainTumour.tar -C {MONAI_DATA_DIR}",)
+       )
 
 app = modal.App(image=image)
 
